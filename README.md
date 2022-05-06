@@ -322,3 +322,54 @@ routes/router.js
 ```tsx
 router.use("/api/users", require("./UserRoutes"));
 ```
+
+## Iniciando a validação
+
+Registro do usuario
+
+Criando validações com express validator
+
+Criando pasta middlewares
+Middleware e nada mais nada menos que uma verificao entre no meio de uma requisição
+
+middlewares/handleValidation.js
+
+```tsx
+// importamos o validationResult
+const { validationResult } = require("express-validator");
+
+// criamos validade com req,res,next  next se nao tiver erro continua
+const validate = (req, res, next) => {
+  //toda requisição que tiver middleware de validação vai retornar possíveis erros
+  const errors = validationResult(req);
+
+  //se tiver nenhum erro continua next()
+  if (errors.isEmpty()) {
+    return next();
+  }
+  //criamos um array vazio
+  const extractedErrors = [];
+
+  // pegamos nossos erros e colocamos no array vazio
+  errors.array().map((err) => extractedErrors.push(err.msg));
+
+  //retornamos 422 passando pra json  com errors 422 nao foi bem sucedido por algum motivo
+  return res.status(422).json({
+    errors: extractedErrors,
+  });
+};
+//exportamos o validate
+module.exports = validate;
+```
+
+Vamos utilizar ele nas rotas
+
+routes/UserRoutes.js
+
+```tsx
+//importamos o middleware
+const validate = require("../middlewares/handleValidation");
+
+//colocamos no meio da requisição do usuario e a resposta que vai obter
+router.post("/register", validate, register);
+```
