@@ -236,3 +236,30 @@ const User = mongoose.model("User", userSchema);
 
 module.exports = User;
 ```
+
+## Criando model da Photo
+
+models/Photo.js
+
+```tsx
+const mongoose = require("mongoose");
+const { Schema } = mongoose;
+
+const photoSchema = new Schema(
+  {
+    image: String,
+    title: String,
+    likes: Array,
+    comments: Array,
+    userId: mongoose.ObjectId,
+    userName: String,
+  },
+  {
+    timestamps: true,
+  }
+);
+
+const Photo = mongoose.model("Photo", photoSchema);
+
+module.exports = Photo;
+```
