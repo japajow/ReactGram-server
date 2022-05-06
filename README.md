@@ -577,3 +577,40 @@ const login = async (req, res) => {
   });
 };
 ```
+
+## Criando a validação de autenticação
+
+Criando o middleware authGuard.js
+
+```tsx
+const User = require("../models/User");
+const jwt = require("jsonwebtoken");
+const jwtSecret = process.env.JWT_SECRET;
+
+const authGuard = async (req, res, next) => {
+  // toda requisição tem os padrões , tem os headers que tem o authorization
+  const authHeader = req.headers["authorization"];
+  //Verificando se o authHeader existe and a segunda parte do header
+  // Bearer jsjaosjoajsoajos pegando a segunda parte que e o token
+  const token = authHeader && authHeader.split(" ")[1];
+
+  //checando se existe um token
+  // se nao tiver o authorization ja vai da erro
+  if (!token) return res.status(401).json({ erros: ["Acesso Negado!"] });
+
+  //checando se o token e valido
+  try {
+    // verificamos o token com jwtSecret comparando os dois token
+    const verified = jwt.verify(token, jwtSecret);
+    // jogamos o objeto do usuario pegando pelo id , tirando o password pq nao precisamos dele
+    req.user = await User.findById(verified.id).select("-password");
+    // segue em frente com next()
+    next();
+  } catch (error) {
+    // se cair aqui e pq o token e invalido
+    res.status(401).json({ erros: ["token invalido"] });
+  }
+};
+
+module.exports = authGuard;
+```
