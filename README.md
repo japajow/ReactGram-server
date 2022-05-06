@@ -490,3 +490,58 @@ const register = async (req, res) => {
 
 Funcionando perfeitamente
 ```
+
+## Validação do Login
+
+Vamos no UserValidations.js
+
+```tsx
+//criamos uma funcao de loginValidation
+
+const loginValidation = () => {
+  return [
+    body("email")
+      .isString()
+      .withMessage("O e-mail e obrigatório")
+      .isEmail()
+      .withMessage("Insira um e-mail valido"),
+    body("password").isString().withMessage("A senha e obrigatória"),
+  ];
+};
+//adicionamos o loginValidation no exports
+module.exports = {
+  userCreateValidation,
+  loginValidation,
+};
+```
+
+Agora vamos no UserController.js
+
+```tsx
+// logando o usuario
+const login = (req, res) => {
+  res.send("Login");
+};
+
+module.exports = {
+  register,
+  login,
+};
+```
+
+Vamos criar uma rota routes/UserRoutes.js
+
+```tsx
+//importamos do controller o login
+
+const { register, login } = require("../controllers/UserController");
+
+// importamos o loginValidation
+const {
+  userCreateValidation,
+  loginValidation,
+} = require("../middlewares/useValidations");
+
+//criamos a rota com post
+router.post("/login", loginValidation(), validate, login);
+```
