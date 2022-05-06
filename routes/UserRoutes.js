@@ -6,9 +6,9 @@ const { register } = require("../controllers/UserController");
 
 //Middleware
 const validate = require("../middlewares/handleValidation");
+const { userCreateValidation } = require("../middlewares/useValidations");
 
 //rotas
-router.post("/register", validate, register);
-console.log(register);
+router.post("/register", userCreateValidation(), validate, register);
 
 module.exports = router;
