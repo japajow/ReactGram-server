@@ -114,10 +114,22 @@ http://localhost:5000
 app.use(cors({ credentials: true, origin: process.env.BASE_URL }));
 ```
 
+arquivo .env
+
+```tsx
+BASE_URL=http://localhost:3000
+```
+
 Definindo o diretório de upload das imagens
 
 ```tsx
 app.use("/upload", express.static(path.join(__dirname, process.env.UPLOADS)));
+```
+
+arquivo .env
+
+```tsx
+UPLOADS = "/uploads";
 ```
 
 Criamos a pasta uploads/users e photos
@@ -138,4 +150,63 @@ const mongoose = require("mongoose");
 
 https://www.mongodb.com/pt-br/cloud/atlas/efficiency
 
-Criando a conta 
+Criando a conta
+
+Criamos o usuario
+
+Add entries to your IP Access list
+192.168.1.13 MyIP
+
+Connect > Connect your application
+
+No Arquivo db.js
+
+```tsx
+const dbUser = "";
+const dbPassword = "";
+const conn = async () => {
+  try {
+    const dbConn = await mongoose.connect(
+      "mongodb+srv://reactgramjapajow:<password>@cluster0.1vxtx.mongodb.net/myFirstDatabase?retryWrites=true&w=majority"
+    );
+
+    console.log("Conectou ao banco");
+
+    return dbConn;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+conn();
+
+module.exports = conn;
+```
+
+Configuramos a senha e de no .env
+
+Usamos a variável DB_PASS e DB_USER no db.js
+
+```tsx
+const mongoose = require("mongoose");
+const dbUser = process.env.DB_USER;
+const dbPassword = process.env.DB_PASS;
+
+const conn = async () => {
+  try {
+    const dbConn = await mongoose.connect(
+      `mongodb+srv://${dbUser}:${dbPassword}@cluster0.1vxtx.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`
+    );
+
+    console.log("Conectou ao banco");
+
+    return dbConn;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+conn();
+
+module.exports = conn;
+```
