@@ -137,3 +137,5 @@ const mongoose = require("mongoose");
 ## Conexão com MongoDB Atlas
 
 https://www.mongodb.com/pt-br/cloud/atlas/efficiency
+
+Criando a conta 
