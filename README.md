@@ -436,3 +436,57 @@ module.exports = {
   userCreateValidation,
 };
 ```
+
+## Registro do usuario
+
+Vamos no UserController.js
+
+```tsx
+const register = async (req, res) => {
+  const { name, password, email } = req.body;
+
+  //checamos se o urnário existe
+  const user = await User.finOne({ email });
+  //caso houver o usurário no registro retorna erro
+  if (user) {
+    res.status(422).json({ errors: "Por favor utilize outro email" });
+  }
+
+  //Gerando a senha em hash code
+  const salt = await bcrypt.genSalt();
+  // geramos uma senha com hash e passamos a passwordHash
+  const passwordHash = await bcrypt.hash(password, salt);
+
+  // Criando usuario
+  const newUser = await User.create({
+    name,
+    email,
+    password: passwordHash,
+  });
+  //checamos se o usuario foi gerado com sucesso retorno o token
+  if (!newUser) {
+    res
+      .status(422)
+      .json({ errors: "Houve um erro , por favor tente mais tarde." });
+    return;
+  }
+  //Caso for feito com sucesso gera um token com o id do novo usuario
+  res.status(201).json({
+    _id: newUser._id,
+    token: generateToken(newUser._id),
+  });
+};
+
+//testamos no postman se for sucesso gera o id e o token
+{
+    "_id": "62759636f1beea537eca1810",
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyNzU5NjM2ZjFiZWVhNTM3ZWNhMTgxMCIsImlhdCI6MTY1MTg3MzMzNCwiZXhwIjoxNjUyNDc4MTM0fQ.Fbd6y9-eai7T67XEvh2IKN1FkZuoj9KEBO7QaxAXdH4"
+}
+
+//enviando mais uma vez da um erro que ja existe um email
+{
+    "errors": "Por favor utilize outro email"
+}
+
+Funcionando perfeitamente
+```
