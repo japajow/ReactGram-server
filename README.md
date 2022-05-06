@@ -183,7 +183,7 @@ conn();
 module.exports = conn;
 ```
 
-Configuramos a senha e de no .env
+Configuramos a senha e usuário no .env
 
 Usamos a variável DB_PASS e DB_USER no db.js
 
@@ -209,4 +209,30 @@ const conn = async () => {
 conn();
 
 module.exports = conn;
+```
+
+## Criando model do Usuário
+
+models/User.js
+
+```tsx
+const mongoose = require("mongoose");
+const { Schema } = mongoose;
+
+const userSchema = new Schema(
+  {
+    name: String,
+    email: String,
+    password: String,
+    profileImage: String,
+    bio: String,
+  },
+  {
+    timestamps: true,
+  }
+);
+
+const User = mongoose.model("User", userSchema);
+
+module.exports = User;
 ```
