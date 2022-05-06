@@ -105,4 +105,31 @@ router.get("/", (req, res) => {
 abrimos o insomnia e testamos a rota
 http://localhost:5000
 
-## Importando Middleware 
+## Importando Middleware
+
+//resolvendo o problema de cors
+
+```tsx
+//cors
+app.use(cors({ credentials: true, origin: process.env.BASE_URL }));
+```
+
+Definindo o diretório de upload das imagens
+
+```tsx
+app.use("/upload", express.static(path.join(__dirname, process.env.UPLOADS)));
+```
+
+Criamos a pasta uploads/users e photos
+
+e concluindo fazemos a conexão ao db
+
+```tsx
+require("./config/db.js");
+```
+
+Criamos uma pasta chamada config/db.js
+
+```tsx
+const mongoose = require("mongoose");
+```

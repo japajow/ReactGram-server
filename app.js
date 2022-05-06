@@ -15,6 +15,15 @@ app.use(express.urlencoded({ extended: false }));
 const router = require("./routes/Router.js");
 app.use(router);
 
+//cors
+app.use(cors({ credentials: true, origin: process.env.BASE_URL }));
+
+//uploads image
+app.use("/upload", express.static(path.join(__dirname, process.env.UPLOADS)));
+
+//connection DB
+require("./config/db.js");
+
 app.listen(port, () => {
   console.log(`App rodando na porta ${port}`);
 });
