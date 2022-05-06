@@ -263,3 +263,62 @@ const Photo = mongoose.model("Photo", photoSchema);
 
 module.exports = Photo;
 ```
+
+## Criando controller do usuario
+
+controllers/UserController.js
+
+Antes de mais nada criamos um JWT no nosso .env para token de acesso
+
+Agora no UserController.js
+
+```tsx
+const User = require("../models/User");
+
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+
+const jwtSecret = process.env.JWT_SECRET;
+
+// criamos uma funcao para criar o token
+const generateToken = (id) => {
+  return jwt.sign({ id }, jwtSecret, {
+    expiresIn: "7d", // vence em 7 dias
+  });
+};
+
+// funcao de registrar e logar
+const register = async (req, res) => {
+  res.send("Registro");
+};
+//importamos a funcao register
+module.exports = {
+  register,
+};
+```
+
+Criando a rota de Usuario
+
+routes/UserRoutes.js
+
+```tsx
+const express = require("express");
+const router = express.Router();
+
+// funções do controller
+const { register } = require("../controllers/UserController");
+
+//rotas
+
+router.post("/register", register);
+
+module.exports = router;
+```
+
+Agora vamos no routes/Router principal e chamar a rota de Usuario para incluir na aplicação
+
+routes/router.js
+
+```tsx
+router.use("/api/users", require("./UserRoutes"));
+```
