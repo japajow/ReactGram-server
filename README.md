@@ -7,14 +7,14 @@ npm init
 > Instalando os pacotes no projeto
 > npm i bcryptjs cors dotenv express express-validator jsonwebtoken mongoose multer
 
-bcryptjs Controlador de senhas
-cors Garante acesso no mesmo local origin
-dotenv Onde fica as variáveis do ambiente na nossa aplicação
-express Framework de backend
-express-validator Um middleware para validações dos dados
-jsonwebtoken Na hora da validação ele gera o token e verifica
-mongoose Trabalhar com banco de dados
-multer Upload de imagens no projeto
+- **bcryptjs** Controlador de senhas
+- **cors** Garante acesso no mesmo local origin
+- **dotenv** Onde fica as variáveis do ambiente na nossa aplicação
+- **express** Framework de backend
+- **express-validator** Um middleware para validações dos dados
+- **jsonwebtoken** Na hora da validação ele gera o token e verifica
+- **mongoose** Trabalhar com banco de dados
+- **multer** Upload de imagens no projeto
 
 > Instalação do pacotes de DEV dependencies
 > npm i --save-dev nodemon
@@ -47,4 +47,26 @@ Criamos um script no package.json
     "test": "echo \"Error: no test specified\" && exit 1",
     "server":"nodemon ./app.js"
   },
+```
+
+## Configurando o dotenv
+
+Criamos um arquivo .env na raiz
+
+no app.js
+
+```tsx
+require("dotenv").config();
+```
+
+no arquivo .env
+
+```tsx
+PORT = 5000;
+```
+
+Agora usamos o PORT no app.js
+
+```tsx
+const port = process.env.PORT;
 ```
