@@ -545,3 +545,35 @@ const {
 //criamos a rota com post
 router.post("/login", loginValidation(), validate, login);
 ```
+
+## Login de usuario
+
+no UserController.js
+
+```tsx
+// logando o usuario
+const login = async (req, res) => {
+  const { email, password } = req.body;
+
+  const user = await User.findOne({ email });
+
+  // Checar se o nao usuario existir
+  if (!user) {
+    res.status(404).json({ errors: ["usuario nao existe."] });
+    return;
+  }
+
+  //Checando se a senha combina com a senha do usuario
+  if (!(await bcrypt.compare(password, user.password))) {
+    res.status(422).json({ errors: ["Senha invalida"] });
+    return;
+  }
+
+  // se deu tudo certo retorna o usuario e o token
+  res.status(201).json({
+    _id: user._id,
+    profileImage: user.profileImage,
+    token: generateToken(user._id),
+  });
+};
+```

@@ -19,7 +19,7 @@ const register = async (req, res) => {
   const user = await User.findOne({ email });
   //caso houver o usurário no registro retorna erro
   if (user) {
-    res.status(422).json({ errors: "Por favor utilize outro email" });
+    res.status(422).json({ errors: ["Por favor utilize outro email"] });
   }
 
   //Gerando a senha em hash code
@@ -38,7 +38,7 @@ const register = async (req, res) => {
   if (!newUser) {
     res
       .status(422)
-      .json({ errors: "Houve um erro , por favor tente mais tarde." });
+      .json({ errors: ["Houve um erro , por favor tente mais tarde."] });
     return;
   }
 
@@ -49,8 +49,29 @@ const register = async (req, res) => {
 };
 
 // logando o usuario
-const login = (req, res) => {
-  res.send("Login");
+const login = async (req, res) => {
+  const { email, password } = req.body;
+
+  const user = await User.findOne({ email });
+
+  // Checar se o nao usuario existir
+  if (!user) {
+    res.status(404).json({ errors: ["usuario nao existe."] });
+    return;
+  }
+
+  //Checando se a senha combina com a senha do usuario
+  if (!(await bcrypt.compare(password, user.password))) {
+    res.status(422).json({ errors: ["Senha invalida"] });
+    return;
+  }
+
+  // se deu tudo certo retorna o usuario e o token
+  res.status(201).json({
+    _id: user._id,
+    profileImage: user.profileImage,
+    token: generateToken(user._id),
+  });
 };
 
 module.exports = {
