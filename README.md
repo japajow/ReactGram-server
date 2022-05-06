@@ -70,3 +70,39 @@ Agora usamos o PORT no app.js
 ```tsx
 const port = process.env.PORT;
 ```
+
+## Testando a Rota do API
+
+Criando a pasta models controllers e routes
+
+routes/router.js
+
+```tsx
+const express = require("express");
+const router = express();
+
+module.exports = router;
+```
+
+No app.js
+
+```tsx
+//router
+const router = require("./routes/Router.js");
+app.use(router);
+```
+
+Colocamos uma rota de teste para ver se esta funcionando
+
+routes/router.js
+
+```tsx
+router.get("/", (req, res) => {
+  res.send("API WORKING!");
+});
+```
+
+abrimos o insomnia e testamos a rota
+http://localhost:5000
+
+## Importando Middleware 
