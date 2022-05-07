@@ -922,3 +922,88 @@ const validate = require("../middlewares/handleValidation");
 
 module.exports = router;
 ```
+
+## Configuracao inicial para rotas de fotos Part 2
+
+vamos no PhotoController.js
+
+```tsx
+const Photo = require("../models/Photo");
+
+const mongoose = require("mongoose");
+
+// Inserindo uma photo relacionado ao usuario que postou
+
+const insertPhoto = async (req, res) => {
+  const { title } = req.body;
+  const image = req.file.filename;
+
+  console.log(req.body);
+
+  res.send("Photo insert by user");
+};
+
+module.exports = insertPhoto;
+```
+
+Vamos no PhotoRoutes.js
+
+```tsx
+// Controller
+const { insertPhoto } = require("../controllers/PhotoController");
+
+// e passamos na routes
+// Routes
+router.post(
+  "/",
+  authGuard,
+  imageUpload.single("image"),
+  photoInsertValidation(),
+  validate,
+  insertPhoto
+);
+```
+
+Agora vamos no router.js
+
+```tsx
+router.use("/api/photos", require("./PhotoRoutes"));
+```
+
+PhotoCOntroller.js
+
+```tsx
+const Photo = require("../models/Photo");
+
+const mongoose = require("mongoose");
+const User = require("../models/User");
+
+// Inserindo uma photo relacionado ao usuario que postou
+
+const insertPhoto = async (req, res) => {
+  const { title } = req.body;
+  const image = req.file.filename;
+
+  const reqUser = req.user;
+
+  const user = await User.findById(reqUser._id);
+
+  const newPhoto = await Photo.create({
+    image,
+    title,
+    userId: user._id,
+    userName: user.name,
+  });
+
+  //Verificar se foi sucesso
+  if (!newPhoto) {
+    res.status(422).json({
+      erros: ["Houve um problema , por favor tente novamente mais tarde"],
+    });
+  }
+
+  res.status(201).json(newPhoto);
+};
+
+module.exports = { insertPhoto };
+```

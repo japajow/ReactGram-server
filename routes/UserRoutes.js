@@ -18,7 +18,7 @@ const {
   userUpdateValidation,
 } = require("../middlewares/useValidations");
 const authGuard = require("../middlewares/authguard");
-const { imageUpload } = require("../middlewares/imageupload");
+const { imageUpload } = require("../middlewares/imageUpload");
 
 //rotas
 router.post("/register", userCreateValidation(), validate, register);
