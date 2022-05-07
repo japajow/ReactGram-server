@@ -767,3 +767,58 @@ module.exports = {
   update,
 };
 ```
+
+## Atualizando usuario
+
+no UserController.js
+
+```tsx
+//importamos o mongoose
+const mongoose = require("mongoose");
+
+const update = async (req, res) => {
+  // pegando valores que pode vir ou nao pela requisição
+  const { name, password, bio } = req.body;
+
+  // criamos uma variável imagem como nulo
+  let profileImage = null;
+
+  //verificamos se chegou uma requisição de imagem
+  if (req.file) {
+    //se chegou atribuímos a profileImage pegando a requisição do filename
+    profileImage = req.file.filename;
+  }
+
+  //atribuímos o usuario que tem no token req.user
+  const reqUser = req.user;
+  //pegamos o usuario pelo ID pegando pelo token , sem o password
+  const user = await User.findById(mongoose.Types.ObjectId(reqUser._id)).select(
+    "-password"
+  );
+  //verificamos se o nome chegou
+  if (name) {
+    user.name = name;
+  }
+  //verificamos se a senha chegou
+  if (password) {
+    const salt = await bcrypt.genSalt();
+    const passwordHash = await bcrypt.hash(password, salt);
+
+    // passamo a senha com hash para o user.password
+    user.password = passwordHash;
+  }
+
+  // se chegou uma requisição de profileImage
+  if (profileImage) {
+    user.profileImage = profileImage;
+  }
+  //se chegou a bio
+  if (bio) {
+    user.bio = bio;
+  }
+  //salvamos ele no banco
+  await user.save();
+  //damos um resolve 200 passando o user no json
+  res.status(200).json(user);
+};
+```
