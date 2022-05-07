@@ -649,3 +649,55 @@ const authGuard = require("../middlewares/authguard");
 //Criamos a rota profile usando o authGuard e getCurrentUser
 router.get("/profile", authGuard, getCurrentUser);
 ```
+
+## Middleware de upload de imagens
+
+criamos middlewares/imageUpload.js
+
+```tsx
+//upload de arquivos
+const multer = require("multer");
+//module padrão do node
+const path = require("path");
+
+//Destino da imagem a ser salva
+const imageStorage = multer.diskStorage({
+  //destino requisição ,arquivo e callback
+  destination: (req, file, cb) => {
+    let folder = ""; // pasta vazia
+
+    // se a requisição tiver users
+    if (req.baseUrl.includes("users")) {
+      //a pasta vai ser users
+      folder = "users";
+    } else if (req.baseUrl.includes("photos")) {
+      //se incluir photos , a pasta nome sera photos
+      folder = "photos";
+    }
+    //callback com o destino do uploads e users ou photos
+    cb(null, `uploads/${folder}/`);
+  },
+  //definindo o nome da imagem arquivo, requisição, pasta , callback
+  filename: (req, file, cb) => {
+    // data horário milissegundos e o caminho
+    cb(null, Date.now() + path.extname(file.originalname));
+  },
+});
+
+//mini validação da imagem e aonde vai ser salva
+const imageUpload = multer({
+  //setando aonde vai ser salvo , passando a funcao que criamos acima
+  storage: imageStorage,
+  // filtrando a extensão do arquivo
+  fileFilter(req, file, cb) {
+    if (!file.originalname.match(/\.(png|jpg)$/)) {
+      //upload only png and jpg
+      return cb(new Error("Por favor enviar apenas png ou jpg !"));
+    }
+    //se nao cair no if retorna true e o código seja continuado
+    cb(undefined, true);
+  },
+});
+
+module.exports = { imageUpload };
+```
