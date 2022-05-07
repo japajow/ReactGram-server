@@ -701,3 +701,69 @@ const imageUpload = multer({
 
 module.exports = { imageUpload };
 ```
+
+## Middleware de atualização do usuario
+
+vamos no userValidation.js
+
+```tsx
+//Criamos a validação
+const userUpdateValidation = () => {
+  return [
+    body("name")
+      .optional()
+      .isLength({ min: 3 })
+      .withMessage("O nome precisa de pelo menos 3 caracteres"),
+    body("password")
+      .optional()
+      .isLength({ min: 5 })
+      .withMessage("A senha precisa ter no mínimo 5 caracteres"),
+  ];
+};
+
+//exportamos
+module.exports = {
+  userCreateValidation,
+  loginValidation,
+  userUpdateValidation,
+};
+```
+
+Agora no UserRoutes.js
+
+```tsx
+router.put(
+  "/",
+  authGuard,
+  userUpdateValidation(),
+  validate,
+  imageUpload.single("profileImage"),
+  update >> ainda nao existe
+);
+
+
+const {
+  register,
+  login,
+  getCurrentUser,
+  update
+} = require("../controllers/UserController");
+```
+
+Criando o update no Controller
+UserController.js
+
+```tsx
+const update = async (req, res) => {
+  res.send("update");
+};
+
+//exportamos o update
+
+module.exports = {
+  register,
+  login,
+  getCurrentUser,
+  update,
+};
+```
