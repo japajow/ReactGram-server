@@ -614,3 +614,38 @@ const authGuard = async (req, res, next) => {
 
 module.exports = authGuard;
 ```
+
+## Resgatando o usuario autenticado
+
+Criando a funcao noUserCOntroller.js
+
+```tsx
+// recuperando dados do usuario logado
+const getCurrentUser = async (req, res) => {
+  const user = req.user;
+  res.status(200).json(user);
+};
+
+module.exports = {
+  register,
+  login,
+  getCurrentUser,
+};
+```
+
+No arquivo de UserRoutes.js
+
+```tsx
+//importamos getCurrentUser
+const {
+  register,
+  login,
+  getCurrentUser,
+} = require("../controllers/UserController");
+
+//importamos o authGuard
+const authGuard = require("../middlewares/authguard");
+
+//Criamos a rota profile usando o authGuard e getCurrentUser
+router.get("/profile", authGuard, getCurrentUser);
+```
