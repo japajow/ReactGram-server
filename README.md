@@ -854,3 +854,71 @@ UserRoutes.js
 // passamos o getUserById  e nao precisa de nenhum middleware
 router.get("/:id", getUserById);
 ```
+
+## Configuracao inicial para rotas de fotos Part 1
+
+Criamos o controller da foto
+controller/PhotoController.js
+
+Criamos a rota da foto
+router/PhotoRoutes.js
+
+```tsx
+const express = require("express");
+const router = express.Router();
+
+// Controller
+
+// Middleware
+
+// Routes
+
+module.exports = router;
+```
+
+Criando o middleware/photoValidation.js
+
+```tsx
+const { body } = require("express-validator");
+
+const photoInsertValidation = () => {
+  return [
+    body("title")
+      .not()
+      .equals("undefined")
+      .withMessage("O titulo e obrigatório")
+      .isString(0)
+      .withMessage("O titulo e obrigatório")
+      .isLength({ min: 3 })
+      .withMessage("O titulo precisa ter no mínimo 3 caracteres "),
+    body("image").custom((value, { req }) => {
+      if (!req.file) {
+        const newLocal = "A imagem e obrigatória";
+        throw new Error(newLocal);
+      }
+
+      return true;
+    }),
+  ];
+};
+
+module.exports = { photoInsertValidation };
+```
+
+importamos no /PhotoRoutes.js
+
+```tsx
+const express = require("express");
+const router = express.Router();
+
+// Controller
+
+// Middleware
+const { photoInsertValidation } = require("../middlewares/photoValidation");
+const authGuard = require("../middlewares/authguard");
+const validate = require("../middlewares/handleValidation");
+
+// Routes
+
+module.exports = router;
+```
