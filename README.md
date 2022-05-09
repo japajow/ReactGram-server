@@ -1219,3 +1219,82 @@ Vamos na PhotoRoutes.js e criamos a rota
 ```tsx
 router.get("/:id", authGuard, getPhotoById);
 ```
+
+## Atualizando fotos
+
+Vamos na PhotoSoutes.js
+
+```tsx
+// Atualizando a foto
+
+const updatePhoto = async (req, res) => {
+  const { id } = req.params;
+  const { title } = req.body;
+  const reqUser = req.user;
+  const photo = await Photo.findById(id);
+
+  // checando se a foto existe
+  if (!photo) {
+    res.status(404).json({ errors: ["foto nao encontrada"] });
+    return;
+  }
+
+  // Verificar se a foto pertence ao usuario
+  if (!photo.user.Id.equals(reqUser._id)) {
+    res.status(422).json({
+      errors: ["Ocorreu um erro , por favor tente novamente mais tarde"],
+    });
+
+    return;
+  }
+
+  //Verifica se o titulo existe
+  if (title) {
+    photo.title = title;
+  }
+
+  //salvamos a photo
+  await photo.save(); //assim atualizamos os dados
+  res.status(200).json({ photo, message: "Foto atualizada com sucesso!" });
+};
+
+//Exportamos updatePhoto
+module.exports = {
+  insertPhoto,
+  deletePhoto,
+  getAllPhotos,
+  getUserPhotos,
+  getPhotoById,
+  updatePhoto,
+};
+```
+
+Vamos na PhotoRoutes.js
+
+```tsx
+router.put("/:id", authGuard, updatePhoto);
+```
+
+Criando o middleware verificando o titulo
+PhotoValidation.js
+
+```tsx
+const photoUpdateValidation = () => {
+  return [
+    body("title")
+      .optional()
+      .isString()
+      .withMessage("O titulo e obrigatório")
+      .isLength({ min: 3 })
+      .withMessage("O titulo precisa ter no mínimo 3 caracteres "),
+  ];
+};
+
+module.exports = { photoInsertValidation, photoUpdateValidation };
+```
+
+Agora usamos o middleware na rota do updatePhoto
+
+```tsx
+router.put("/:id", authGuard, photoUpdateValidation(), validate, updatePhoto);
+```
