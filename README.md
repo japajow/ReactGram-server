@@ -1007,3 +1007,119 @@ const insertPhoto = async (req, res) => {
 
 module.exports = { insertPhoto };
 ```
+
+## Excluindo fotos
+
+No PhotoControllers.js
+
+```tsx
+//removendo a photo no db
+
+const deletePhoto = async (req, res) => {
+  //pegamos o id da photo pela URL
+  const { id } = req.params;
+  //pegamos o usuario pela requisição
+  const reqUser = req.user;
+  //pegamos a foto
+  const photo = await Photo.findById(mongoose.Types.ObjectId(id));
+
+  // Verificamos se a foto existe
+
+  if (!photo) {
+    res.status(404).json({ errors: ["Foto nao encontrada!"] });
+    return;
+  }
+
+  // Verificamos se a foto pertence ao usuario
+  if (!photo.userId.equals(reqUser._id)) {
+    res.status(422).json({
+      errors: ["Ocorreu um erro, por favor tente novamente mais tarde."],
+    });
+  }
+
+  // Caso chegar ate aqui deletamos a foto
+  await Photo.findByIdAndDelete(photo._id);
+
+  res
+    .status(200)
+    .json({ id: photo._id, message: "Foto excluída com sucesso!" });
+};
+
+// exportamos deletePhoto
+module.exports = { insertPhoto, deletePhoto };
+```
+
+Vamos no PhotoRoutes.js e usamos o delete photo nele
+
+PhotoRoutes.js
+
+```tsx
+//importamos deletePhoto
+const { insertPhoto, deletePhoto } = require("../controllers/PhotoController");
+router.delete("/:id", authGuard, deletePhoto);
+```
+
+Inserimos o try catch para pegar o erro
+No PhotoController.js
+
+```tsx
+try {
+  //pegamos a foto
+  const photo = await Photo.findById(mongoose.Types.ObjectId(id));
+
+  // Verificamos se a foto existe
+
+  if (!photo) {
+    res.status(404).json({ errors: ["Foto nao encontrada!"] });
+    return;
+  }
+
+  // Verificamos se a foto pertence ao usuario
+  if (!photo.userId.equals(reqUser._id)) {
+    res.status(422).json({
+      errors: ["Ocorreu um erro, por favor tente novamente mais tarde."],
+    });
+  }
+
+  // Caso chegar ate aqui deletamos a foto
+  await Photo.findByIdAndDelete(photo._id);
+
+  res
+    .status(200)
+    .json({ id: photo._id, message: "Foto excluída com sucesso!" });
+} catch (error) {
+  res.status(404).json({ errors: ["Foto nao encontrada!"] });
+}
+```
+
+## Resgatando todas as fotos
+
+No PhotoController.js
+
+````tsx
+//Pegando todas as fotos existente no bd
+const getAllPhotos = async (req, res) => {
+  const photos = await Photo.find({})
+    .sort([["createdAt", -1]])
+    .exec();
+  return res.status(200).json(photos);
+};
+
+// exportamos a funcao getAllPhotos
+module.exports = { insertPhoto, deletePhoto, getAllPhotos };```
+````
+
+Colocamos na routes PhotoRoutes.js
+
+```tsx
+//importamos
+// getAllPhotos
+const {
+  insertPhoto,
+  deletePhoto,
+  getAllPhotos,
+} = require("../controllers/PhotoController");
+
+//Criamos a rota com authGuard o cliente tem que esta logado
+router.get("/", authGuard, getAllPhotos);
+```
