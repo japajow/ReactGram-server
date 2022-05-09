@@ -1431,3 +1431,34 @@ Criamos a rota de like
 ```tsx
 router.put("/like/:id", authGuard, likePhoto);
 ```
+
+## Funcionalidade de busca das fotos
+
+```tsx
+const searchPhoto = async (req, res) => {
+  const { q } = req.query;
+
+  const photos = await Photo.find({ title: new RegExp(q, "i") }).exec();
+
+  res.status(200).json(photos);
+};
+
+module.exports = {
+  insertPhoto,
+  deletePhoto,
+  getAllPhotos,
+  getUserPhotos,
+  getPhotoById,
+  updatePhoto,
+  commentPhoto,
+  likePhoto,
+  searchPhoto,
+};
+```
+
+PhotoRoutes.js
+
+```tsx
+// colocamos acima de todos /:id
+router.get("/search", authGuard, searchPhoto);
+```
