@@ -145,6 +145,47 @@ const updatePhoto = async (req, res) => {
   res.status(200).json({ photo, message: "Foto atualizada com sucesso!" });
 };
 
+// funcionalidade de comentário
+
+const commentPhoto = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { comment } = req.body;
+
+    const reqUser = req.user;
+
+    const user = await User.findById(reqUser._id);
+
+    const photo = await Photo.findById(id);
+
+    // checando se a foto existe
+    if (!photo) {
+      res.status(404).json({ errors: ["foto nao encontrada"] });
+      return;
+    }
+    //Adicionando o comentário com arrays
+    const userComment = {
+      comment,
+      userName: user.name,
+      userImage: user.profileImage,
+      userId: user._id,
+    };
+
+    //adicionamos o comentário
+    await photo.comments.push(userComment);
+    //atualizamos a foto com comentário
+    await photo.save();
+
+    res.status(200).json({
+      comment: userComment,
+      message: "O comentário foi adicionado com sucesso!",
+    });
+  } catch (error) {
+    res.status(422).json({ errors: ["Ocorreu algum erro , tente novamente!"] });
+    return;
+  }
+};
+
 module.exports = {
   insertPhoto,
   deletePhoto,
@@ -152,4 +193,5 @@ module.exports = {
   getUserPhotos,
   getPhotoById,
   updatePhoto,
+  commentPhoto,
 };

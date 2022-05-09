@@ -1181,7 +1181,7 @@ const getUserPhotos = async (req, res) => {
 
 ## Resgatando foto por ID
 
-Vamos na PhotoSoutes.js
+Vamos na PhotoController.js
 
 ```tsx
 const getPhotoById = async (req, res) => {
@@ -1297,4 +1297,88 @@ Agora usamos o middleware na rota do updatePhoto
 
 ```tsx
 router.put("/:id", authGuard, photoUpdateValidation(), validate, updatePhoto);
+```
+
+## Comentário na foto
+
+Vamos na PhotoController.js
+
+```tsx
+const commentPhoto = async (req, res) => {
+  const { id } = req.params;
+  const { comment } = req.body;
+
+  const reqUser = req.user;
+
+  const user = await User.findById(reqUser._id);
+
+  const photo = await Photo.findById(id);
+
+  // checando se a foto existe
+  if (!photo) {
+    res.status(404).json({ errors: ["foto nao encontrada"] });
+    return;
+  }
+  //Adicionando o comentário com arrays
+  const userComment = {
+    comment,
+    userName: user.name,
+    userImage: user.profileImage,
+    userId: user._id,
+  };
+
+  //adicionamos o comentário
+  photo.comments.push(userComment);
+  //atualizamos a foto com comentário
+  await photo.save();
+
+  res.status(200).json({
+    comment: userComment,
+    message: "O comentário foi adicionado com sucesso!",
+  });
+};
+
+module.exports = {
+  insertPhoto,
+  deletePhoto,
+  getAllPhotos,
+  getUserPhotos,
+  getPhotoById,
+  updatePhoto,
+  commentPhoto,
+};
+```
+
+Vamos na rota e inserir o comentário
+
+```tsx
+router.put("/comment/:id", authGuard, commentPhoto);
+```
+
+Criamos tambem a validação no middleware do comentário
+
+photoValidation.js
+
+```tsx
+const commentValidation = () => {
+  return [body("comment").isString().withMessage("O comentário e obrigatório")];
+};
+
+module.exports = {
+  photoInsertValidation,
+  photoUpdateValidation,
+  commentValidation,
+};
+```
+
+incluímos a validação na rota
+
+```tsx
+router.put(
+  "/comment/:id",
+  authGuard,
+  commentValidation(),
+  validate,
+  commentPhoto
+);
 ```
