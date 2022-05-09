@@ -1382,3 +1382,52 @@ router.put(
   commentPhoto
 );
 ```
+
+## Like na foto
+
+```tsx
+const likePhoto = async (req, res) => {
+  const { id } = req.params;
+  const reqUser = req.user;
+
+  const photo = await Photo.findById(id);
+  if (!photo) {
+    res.status(404).json({ errors: ["foto nao encontrada"] });
+    return;
+  }
+
+  // verificando se o usuario ja deu um like
+  if (photo.likes.includes(reqUser._id)) {
+    res.status(422).json({ errors: ["Voce ja curtiu a foto"] });
+    return;
+  }
+
+  // se deu tudo certo colocar o id do usuario no array
+  photo.likes.push(reqUser._id);
+
+  photo.save();
+
+  res.status(200).json({
+    photoId: id,
+    userId: reqUser._id,
+    message: "A foto foi curtida",
+  });
+};
+
+module.exports = {
+  insertPhoto,
+  deletePhoto,
+  getAllPhotos,
+  getUserPhotos,
+  getPhotoById,
+  updatePhoto,
+  commentPhoto,
+  likePhoto,
+};
+```
+
+Criamos a rota de like
+
+```tsx
+router.put("/like/:id", authGuard, likePhoto);
+```
