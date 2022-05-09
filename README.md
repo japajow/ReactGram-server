@@ -1178,3 +1178,44 @@ const getUserPhotos = async (req, res) => {
   }
 };
 ```
+
+## Resgatando foto por ID
+
+Vamos na PhotoSoutes.js
+
+```tsx
+const getPhotoById = async (req, res) => {
+  try {
+    // Checamos se a foto existe
+    const { id } = req.params;
+
+    const photo = await Photo.findById(mongoose.Types.ObjectId(id));
+
+    if (!photo) {
+      res.status(404).json({ errors: ["Foto nao encontrada!"] });
+      return;
+    }
+
+    //Caso houver a foto
+    res.status(200).json(photo);
+  } catch (error) {
+    res.status(404).json({ errors: ["Foto nao encontrada!"] });
+    return;
+  }
+};
+
+//exportamos getPhotoById
+module.exports = {
+  insertPhoto,
+  deletePhoto,
+  getAllPhotos,
+  getUserPhotos,
+  getPhotoById,
+};
+```
+
+Vamos na PhotoRoutes.js e criamos a rota
+
+```tsx
+router.get("/:id", authGuard, getPhotoById);
+```
