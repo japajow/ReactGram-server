@@ -1123,3 +1123,58 @@ const {
 //Criamos a rota com authGuard o cliente tem que esta logado
 router.get("/", authGuard, getAllPhotos);
 ```
+
+## Resgatando fotos do usuario
+
+No PhotoController.js
+
+```tsx
+//Pegando fotos especifico do usuario
+const getUserPhotos = async (req, res) => {
+  //pegando o id pela URL
+  const { id } = req.params;
+
+  const photos = Photo.find({ userId: id })
+    .sort([["createdAt", -1]])
+    .exec();
+
+  return res.status(200).json(photos);
+};
+//exportamos
+module.exports = { insertPhoto, deletePhoto, getAllPhotos, getUserPhotos };
+```
+
+Vamos na PhotoSoutes.js
+
+```tsx
+//importamos getUserPhotos
+const {
+  insertPhoto,
+  deletePhoto,
+  getAllPhotos,
+  getUserPhotos,
+} = require("../controllers/PhotoController");
+
+//criamos a rota
+router.get("/user/:id", authGuard, getUserPhotos);
+```
+
+Colocamos o try catch para pegar o erro caso nao encontrar a foto do usuario
+
+```tsx
+//Pegando fotos especifico do usuario
+const getUserPhotos = async (req, res) => {
+  //pegando o id pela URL
+  const { id } = req.params;
+
+  try {
+    const photos = await Photo.find({ userId: id })
+      .sort([["createdAt", -1]])
+      .exec();
+
+    return res.status(200).json(photos);
+  } catch (error) {
+    return res.status(404).json({ errors: ["Foto nao encontrada!"] });
+  }
+};
+```

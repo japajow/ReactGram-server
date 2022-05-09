@@ -75,4 +75,20 @@ const getAllPhotos = async (req, res) => {
   return res.status(200).json(photos);
 };
 
-module.exports = { insertPhoto, deletePhoto, getAllPhotos };
+//Pegando fotos especifico do usuario
+const getUserPhotos = async (req, res) => {
+  //pegando o id pela URL
+  const { id } = req.params;
+
+  try {
+    const photos = await Photo.find({ userId: id })
+      .sort([["createdAt", -1]])
+      .exec();
+
+    return res.status(200).json(photos);
+  } catch (error) {
+    return res.status(404).json({ errors: ["Foto nao encontrada!"] });
+  }
+};
+
+module.exports = { insertPhoto, deletePhoto, getAllPhotos, getUserPhotos };
